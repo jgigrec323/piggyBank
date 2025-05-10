@@ -1,0 +1,26 @@
+[
+  {
+    "id": "c1",
+    "name": "Amira",
+    "tasksTotal": 10,
+    "tasksDone": 7,
+    "avatar": "👧",
+    "themeColor": "#7e57c2"
+  },
+  {
+    "id": "c2",
+    "name": "Tierno",
+    "tasksTotal": 5,
+    "tasksDone": 3,
+    "avatar": "👦",
+    "themeColor": "#f57f17"
+  },
+  {
+    "id": "c3",
+    "name": "Fatou",
+    "tasksTotal": 8,
+    "tasksDone": 6,
+    "avatar": "🧒",
+    "themeColor": "#66bb6a"
+  }
+]
