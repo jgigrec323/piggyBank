@@ -12,6 +12,8 @@ app.get("/", (_req, res) => {
   res.send("Piggy Bank API running...");
 });
 
+app.use("/api/parent", require("./routes/parentRoutes"));
+
 app.listen(process.env.PORT, () => {
   console.log(`🚀 Server running on port ${process.env.PORT}`);
 });
