@@ -5,6 +5,7 @@ import {
   Fredoka_600SemiBold,
 } from "@expo-google-fonts/fredoka";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { AppProvider } from "@/context/app-context";
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -16,7 +17,9 @@ export default function RootLayout() {
   }
   return (
     <GestureHandlerRootView>
-      <Slot></Slot>
+      <AppProvider>
+        <Slot></Slot>
+      </AppProvider>
     </GestureHandlerRootView>
   );
 }

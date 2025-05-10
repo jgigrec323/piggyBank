@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   StyleSheet,
@@ -6,22 +6,61 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
-  Text,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { hp, wp } from "@/utils/responsive";
 import LottieView from "lottie-react-native";
+import { useApp } from "@/context/app-context";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+
+// Dummy game zones with random positions and icons
+const gameZones = [
+  {
+    top: 200,
+    left: 100,
+    icon: require("../../../../data/controller.json"),
+    route: "/game-one",
+  },
+  {
+    top: 300,
+    left: 200,
+    icon: require("../../../../data/controller.json"),
+    route: "/game-two",
+  },
+  {
+    top: 400,
+    left: 80,
+    icon: require("../../../../data/controller.json"),
+    route: "/game-three",
+  },
+  {
+    top: 180,
+    left: 350,
+    icon: require("../../../../data/controller.json"),
+    route: "/",
+  },
+  {
+    top: 500,
+    left: 250,
+    icon: require("../../../../data/controller.json"),
+    route: "/game-ten",
+  },
+];
 
 export default function LandingPage() {
   const [soundOn, setSoundOn] = useState(true);
   const router = useRouter();
+  const { hasBankAccount } = useApp();
+
+  const shuffledZones = useMemo(() => {
+    return [...gameZones].sort(() => Math.random() - 0.5);
+  }, []);
 
   return (
     <View style={styles.container}>
-      {/* Map Scroll */}
+      {/* 🗺 Map Scroll */}
       <ScrollView
         horizontal
         contentContainerStyle={styles.scrollContent}
@@ -32,17 +71,19 @@ export default function LandingPage() {
           showsVerticalScrollIndicator={false}
         >
           <View>
-            {/* MAP GIF */}
+            {/* 📽️ MAP GIF */}
             <Image
               source={require("../../../../assets/images/map.gif")}
               style={styles.map}
               resizeMode="cover"
             />
 
-            {/* ZONE 1: Village */}
+            {/* 🏦 Bank Zone */}
             <TouchableOpacity
-              style={[styles.zone, { top: 120, left: 80 }]}
-              onPress={() => router.push("/stage-one")}
+              style={[styles.zone, { top: 100, left: 60 }]}
+              onPress={() =>
+                router.push(hasBankAccount ? "/stage-two" : "/stage-one")
+              }
             >
               <LottieView
                 source={require("../../../../data/home.json")}
@@ -52,32 +93,22 @@ export default function LandingPage() {
               />
             </TouchableOpacity>
 
-            {/* ZONE 2: Bank */}
-            {/* Village zone with Lottie */}
-            <TouchableOpacity
-              style={[styles.zone, { top: 500, left: 80 }]}
-              onPress={() => router.push("/")}
-            >
-              <LottieView
-                source={require("../../../../data/invest.json")}
-                autoPlay
-                loop
-                style={{ width: 50, height: 50 }}
-              />
-            </TouchableOpacity>
-
-            {/* ZONE 3: Game area */}
-            <TouchableOpacity
-              style={[styles.zone, { top: 180, left: 450 }]}
-              onPress={() => router.push("/")}
-            >
-              <LottieView
-                source={require("../../../../data/controller.json")}
-                autoPlay
-                loop
-                style={{ width: 50, height: 50 }}
-              />
-            </TouchableOpacity>
+            {/* 🎮 Game Zones — only if bank exists */}
+            {hasBankAccount &&
+              shuffledZones.map((zone, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[styles.zone, { top: zone.top, left: zone.left }]}
+                  onPress={() => router.push(zone.route)}
+                >
+                  <LottieView
+                    source={zone.icon}
+                    autoPlay
+                    loop
+                    style={{ width: 50, height: 50 }}
+                  />
+                </TouchableOpacity>
+              ))}
           </View>
         </ScrollView>
       </ScrollView>
@@ -94,7 +125,7 @@ export default function LandingPage() {
         />
       </TouchableOpacity>
 
-      {/* 🚀 Start Button */}
+      {/* 🚀 Start Button (optional) */}
       <TouchableOpacity style={styles.startBtn}>
         <Ionicons name="rocket" size={20} color="#fff" />
       </TouchableOpacity>
@@ -120,9 +151,6 @@ const styles = StyleSheet.create({
     backgroundColor: "hsla(137, 60.50%, 52.40%, 0.74)",
     borderRadius: 50,
     padding: 10,
-  },
-  zoneIcon: {
-    fontSize: 28,
   },
   soundBtn: {
     position: "absolute",

@@ -3,53 +3,56 @@ import {
   View,
   Text,
   TextInput,
-  StyleSheet,
   TouchableOpacity,
+  StyleSheet,
   Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { hp, wp } from "@/utils/responsive";
+import { useApp } from "@/context/app-context";
 
-export default function Stage1Account() {
+export default function Stage1CreateBank() {
   const [name, setName] = useState("");
-  const [goal, setGoal] = useState("");
+  const [password, setPassword] = useState("");
   const router = useRouter();
+  const { setHasBankAccount } = useApp();
 
   const handleSubmit = () => {
-    if (!name.trim() || !goal.trim()) {
-      Alert.alert("Oops!", "Please fill out both fields.");
+    if (!name.trim() || !password.trim()) {
+      Alert.alert("Oops!", "Please fill in all fields.");
       return;
     }
 
-    // Save to local storage or async storage if needed later
+    Alert.alert("🎉 Success", `Bank account created for ${name}`);
+    setHasBankAccount(true); // ✅ Mark bank account as created
 
-    Alert.alert("🎉 Welcome!", `Hello ${name}, your goal is set!`);
-    router.push("/"); // or next stage
+    router.push("/stage-two"); // Replace with your map or stage route
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🏦 Open Your Piggy Bank</Text>
-      <Text style={styles.subtitle}>
-        Let’s create your very own bank account.
-      </Text>
+      <Text style={styles.emoji}>🏦</Text>
+      <Text style={styles.title}>Create Your Bank Account</Text>
 
       <TextInput
-        placeholder="Your Name"
+        placeholder="Full Name"
         value={name}
         onChangeText={setName}
         style={styles.input}
       />
 
       <TextInput
-        placeholder="What are you saving for?"
-        value={goal}
-        onChangeText={setGoal}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        keyboardType="number-pad"
+        secureTextEntry
         style={styles.input}
+        maxLength={4} // optional 4-digit PIN
       />
 
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Create Account</Text>
+        <Text style={styles.buttonText}>Create Bank Account</Text>
       </TouchableOpacity>
     </View>
   );
@@ -58,39 +61,42 @@ export default function Stage1Account() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: wp(6),
-    justifyContent: "center",
-    backgroundColor: "#fff",
+    paddingTop: hp(12),
+    paddingHorizontal: wp(6),
+    backgroundColor: "#fef9f4",
+    alignItems: "center",
   },
-  title: {
-    fontSize: hp(3),
-    fontWeight: "700",
-    textAlign: "center",
+  emoji: {
+    fontSize: hp(6),
     marginBottom: hp(2),
   },
-  subtitle: {
-    fontSize: hp(2),
-    textAlign: "center",
+  title: {
+    fontSize: hp(2.8),
+    fontWeight: "700",
     marginBottom: hp(4),
+    color: "#333",
   },
   input: {
-    borderWidth: 1.5,
-    borderColor: "#ccc",
-    borderRadius: 12,
-    padding: hp(1.2),
+    width: "100%",
+    backgroundColor: "#fff",
+    padding: hp(1.4),
     fontSize: hp(2),
+    borderRadius: 12,
+    borderColor: "#ccc",
+    borderWidth: 1.2,
     marginBottom: hp(2),
   },
   button: {
     backgroundColor: "#f57f17",
     paddingVertical: hp(2),
-    borderRadius: 14,
+    borderRadius: 12,
+    width: "100%",
     alignItems: "center",
     marginTop: hp(1),
   },
   buttonText: {
     color: "#fff",
-    fontSize: hp(2.2),
+    fontSize: hp(2),
     fontWeight: "600",
   },
 });
