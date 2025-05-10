@@ -43,7 +43,9 @@ const WelcomeScreen = () => {
             title="I’m a Child"
             icon={<Ionicons name="happy" size={20} color="#fff" />}
             color={Colors.light.buttonChild}
-            onPress={() => {}}
+            onPress={() => {
+              router.push("/(auth)/(child)/login");
+            }}
           />
         </View>
       </View>
