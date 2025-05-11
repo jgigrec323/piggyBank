@@ -16,17 +16,14 @@ export default function Stage2AtmScreen() {
   const router = useRouter();
   const {
     moneyInPocket,
-    updatePocket,
     bankUser,
-    completedStages,
-    markStageComplete,
+    bankBalance,
+    bankTransactions,
+    deposit,
+    withdraw,
   } = useApp();
 
-  const [balance, setBalance] = useState(0);
   const [amount, setAmount] = useState("");
-  const [transactions, setTransactions] = useState([
-    { id: "1", label: "Bank Account Created", amount: 0 },
-  ]);
 
   const handleDeposit = () => {
     const amt = parseInt(amount);
@@ -38,12 +35,7 @@ export default function Stage2AtmScreen() {
       Alert.alert("Not enough coins", "You don't have enough in your pocket.");
       return;
     }
-    setBalance((prev) => prev + amt);
-    updatePocket(-amt);
-    setTransactions((prev) => [
-      { id: Date.now().toString(), label: "Deposit from Pocket", amount: amt },
-      ...prev,
-    ]);
+    deposit(amt);
     setAmount("");
   };
 
@@ -53,36 +45,25 @@ export default function Stage2AtmScreen() {
       Alert.alert("Invalid amount", "Please enter a valid withdraw amount.");
       return;
     }
-    if (balance < amt) {
+    if (bankBalance < amt) {
       Alert.alert("Not enough balance", "Your bank balance is too low.");
       return;
     }
-    setBalance((prev) => prev - amt);
-    updatePocket(amt);
-    setTransactions((prev) => [
-      {
-        id: Date.now().toString(),
-        label: "Withdraw to Pocket",
-        amount: -amt,
-      },
-      ...prev,
-    ]);
+    withdraw(amt);
     setAmount("");
   };
 
   return (
     <View style={styles.container}>
-      {/* 🏦 Header */}
       <View style={styles.card}>
         <Text style={styles.name}>👦 {bankUser?.name ?? "Kid"}</Text>
-        <Text style={styles.balance}>Bank Balance: {balance} 🪙</Text>
+        <Text style={styles.balance}>Bank Balance: {bankBalance} 🏦</Text>
         <Text style={styles.balance}>In Pocket: {moneyInPocket} 🪙</Text>
       </View>
 
-      {/* 📜 Transactions */}
       <Text style={styles.sectionTitle}>Transactions</Text>
       <FlatList
-        data={transactions}
+        data={bankTransactions}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.transaction}>
@@ -101,7 +82,6 @@ export default function Stage2AtmScreen() {
         style={styles.txList}
       />
 
-      {/* 💳 Actions */}
       <Text style={styles.sectionTitle}>Manage Your Coins</Text>
       <View style={styles.actionBox}>
         <TextInput
@@ -127,12 +107,8 @@ export default function Stage2AtmScreen() {
         </View>
       </View>
 
-      {/* 🗺 Go to Map */}
       <TouchableOpacity
-        style={[
-          styles.nextBtn,
-          { backgroundColor: "#607d8b", marginTop: hp(4) },
-        ]}
+        style={[styles.nextBtn, { backgroundColor: "#607d8b" }]}
         onPress={() => router.replace("/")}
       >
         <Text style={styles.nextText}>Go to Map</Text>
@@ -220,7 +196,6 @@ const styles = StyleSheet.create({
   },
   nextBtn: {
     marginTop: hp(4),
-    backgroundColor: "#f57f17",
     paddingVertical: hp(2),
     borderRadius: 12,
     alignItems: "center",

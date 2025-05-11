@@ -16,36 +16,48 @@ import { useApp } from "@/context/app-context";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-const gameZones = [
+const ZONES = [
   {
     top: 200,
     left: 100,
     icon: require("../../../../data/controller.json"),
     route: "/game-one",
+    type: "game",
   },
   {
     top: 300,
     left: 200,
     icon: require("../../../../data/controller.json"),
     route: "/game-two",
+    type: "game",
   },
   {
     top: 400,
     left: 80,
     icon: require("../../../../data/controller.json"),
     route: "/game-three",
-  },
-  {
-    top: 180,
-    left: 350,
-    icon: require("../../../../data/controller.json"),
-    route: "/",
+    type: "game",
   },
   {
     top: 500,
     left: 250,
     icon: require("../../../../data/controller.json"),
     route: "/game-ten",
+    type: "game",
+  },
+  {
+    top: 180,
+    left: 350,
+    icon: require("../../../../data/task.json"),
+    route: "/my-tasks",
+    type: "always",
+  },
+  {
+    top: 600,
+    left: 100,
+    icon: require("../../../../data/vault.json"),
+    route: "/shop",
+    type: "always",
   },
 ];
 
@@ -54,31 +66,38 @@ export default function LandingPage() {
   const router = useRouter();
   const { hasBankAccount, moneyInPocket } = useApp();
 
-  const shuffledZones = useMemo(
-    () => [...gameZones].sort(() => Math.random() - 0.5),
+  const alwaysZones = ZONES.filter((z) => z.type === "always");
+  const gameZones = useMemo(
+    () =>
+      ZONES.filter((z) => z.type === "game").sort(() => Math.random() - 0.5),
     []
   );
 
   return (
     <View style={styles.container}>
-      {/* 💰 Wallet Box */}
+      {/* 💰 Coins Display */}
       <View style={styles.coinsBox}>
         <Ionicons name="wallet" size={18} color="#fff" />
         <Text style={styles.coinsText}>{moneyInPocket} coins</Text>
       </View>
 
-      {/* 🗺 Map Scroll */}
-      <ScrollView
-        horizontal
-        contentContainerStyle={styles.scrollContent}
-        showsHorizontalScrollIndicator={false}
+      {/* 🔊 Sound Toggle */}
+      <TouchableOpacity
+        style={styles.soundBtn}
+        onPress={() => setSoundOn(!soundOn)}
       >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
+        <Ionicons
+          name={soundOn ? "volume-high-outline" : "volume-mute-outline"}
+          size={24}
+          color="#fff"
+        />
+      </TouchableOpacity>
+
+      {/* 🗺 Map */}
+      <ScrollView horizontal contentContainerStyle={styles.scrollContent}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
           <View>
-            {/* 📽️ MAP GIF */}
+            {/* 🖼 Map Image */}
             <Image
               source={require("../../../../assets/images/map.gif")}
               style={styles.map}
@@ -100,11 +119,27 @@ export default function LandingPage() {
               />
             </TouchableOpacity>
 
-            {/* 🎮 Game Zones — only if bank exists */}
+            {/* ✅ Always Available Zones */}
+            {alwaysZones.map((zone, index) => (
+              <TouchableOpacity
+                key={`always-${index}`}
+                style={[styles.zone, { top: zone.top, left: zone.left }]}
+                onPress={() => router.push(zone.route)}
+              >
+                <LottieView
+                  source={zone.icon}
+                  autoPlay
+                  loop
+                  style={{ width: 50, height: 50 }}
+                />
+              </TouchableOpacity>
+            ))}
+
+            {/* 🎮 Conditional Game Zones */}
             {hasBankAccount &&
-              shuffledZones.map((zone, index) => (
+              gameZones.map((zone, index) => (
                 <TouchableOpacity
-                  key={index}
+                  key={`game-${index}`}
                   style={[styles.zone, { top: zone.top, left: zone.left }]}
                   onPress={() => router.push(zone.route)}
                 >
@@ -120,22 +155,16 @@ export default function LandingPage() {
         </ScrollView>
       </ScrollView>
 
-      {/* 🔊 Sound toggle */}
-      <TouchableOpacity
-        style={styles.soundBtn}
-        onPress={() => setSoundOn(!soundOn)}
-      >
-        <Ionicons
-          name={soundOn ? "volume-high-outline" : "volume-mute-outline"}
-          size={24}
-          color="#fff"
-        />
-      </TouchableOpacity>
-
-      {/* 🚀 Start Button (optional) */}
-      <TouchableOpacity style={styles.startBtn}>
-        <Ionicons name="rocket" size={20} color="#fff" />
-      </TouchableOpacity>
+      {/* 🧠 Tutorial Tip for Banking */}
+      {!hasBankAccount && (
+        <View style={styles.tipBox}>
+          <Ionicons name="alert-circle-outline" size={18} color="#f57f17" />
+          <Text style={styles.tipText}>
+            Tip: Open your bank account to unlock games and start your
+            adventure!
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -159,25 +188,6 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     padding: 10,
   },
-  soundBtn: {
-    position: "absolute",
-    top: hp(4),
-    right: wp(6),
-    backgroundColor: "rgba(0,0,0,0.4)",
-    padding: 10,
-    borderRadius: 20,
-    zIndex: 10,
-  },
-  startBtn: {
-    position: "absolute",
-    bottom: hp(6),
-    alignSelf: "center",
-    backgroundColor: "#f57f17",
-    paddingHorizontal: wp(10),
-    paddingVertical: hp(1.8),
-    borderRadius: 16,
-    elevation: 4,
-  },
   coinsBox: {
     position: "absolute",
     top: hp(4),
@@ -195,5 +205,34 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: hp(1.8),
     fontWeight: "600",
+  },
+  soundBtn: {
+    position: "absolute",
+    top: hp(4),
+    right: wp(6),
+    backgroundColor: "rgba(0,0,0,0.4)",
+    padding: 10,
+    borderRadius: 20,
+    zIndex: 10,
+  },
+  tipBox: {
+    position: "absolute",
+    bottom: hp(4),
+    left: wp(5),
+    right: wp(5),
+    backgroundColor: "rgb(255, 255, 255)",
+    borderRadius: 12,
+    padding: hp(1.5),
+    flexDirection: "row",
+    alignItems: "center",
+    gap: wp(2),
+    borderColor: "#f57f17",
+    borderWidth: 1,
+  },
+  tipText: {
+    color: "#f57f17",
+    fontSize: hp(1.7),
+    flex: 1,
+    fontWeight: "500",
   },
 });

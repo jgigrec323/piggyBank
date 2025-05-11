@@ -15,6 +15,7 @@ export default function Stage1CreateBank() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+
   const { setHasBankAccount, setBankUser } = useApp();
 
   const handleSubmit = () => {

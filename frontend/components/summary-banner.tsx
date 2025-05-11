@@ -1,12 +1,19 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import children from "@/data/children.json";
 
-const SummaryBanner = () => {
-  const totalTasks = children.reduce((sum, c) => sum + c.tasksTotal, 0);
-  const totalDone = children.reduce((sum, c) => sum + c.tasksDone, 0);
-  const coins = totalDone * 5;
+type Props = {
+  totalChildren: number;
+  totalTasks: number;
+  completedTasks: number;
+};
+
+const SummaryBanner = ({
+  totalChildren,
+  totalTasks,
+  completedTasks,
+}: Props) => {
+  const coins = completedTasks * 5;
 
   return (
     <View style={styles.container}>
@@ -14,7 +21,7 @@ const SummaryBanner = () => {
       <View style={styles.textContainer}>
         <Text style={styles.title}>This Week</Text>
         <Text style={styles.text}>
-          {children.length} Children • {totalTasks} Tasks • {totalDone}{" "}
+          {totalChildren} Children • {totalTasks} Tasks • {completedTasks}{" "}
           Completed
         </Text>
         <Text style={styles.text}>Coins Earned: {coins} 🪙</Text>

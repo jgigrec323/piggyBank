@@ -1,6 +1,4 @@
 import React from "react";
-import { Ionicons } from "@expo/vector-icons";
-
 import {
   View,
   Text,
@@ -8,12 +6,11 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import GameButton from "@/components/game-button";
-import { hp } from "@/utils/responsive";
-import { Colors } from "@/constants/Colors";
+import { hp, wp } from "@/utils/responsive";
 
-const WelcomeScreen = () => {
+export default function WelcomeScreen() {
   const router = useRouter();
 
   return (
@@ -29,31 +26,26 @@ const WelcomeScreen = () => {
         </View>
 
         <View style={styles.buttonContainer}>
-          <GameButton
-            title="I’m a Parent"
-            icon={<Ionicons name="person" size={20} color="#fff" />}
-            color={Colors.light.buttonParent}
-            textColor="#fff"
-            onPress={() => {
-              router.push("/(auth)/(parent)/login");
-            }}
-          />
+          <TouchableOpacity
+            style={[styles.button, styles.parentButton]}
+            onPress={() => router.push("/(auth)/(parent)/login")}
+          >
+            <Ionicons name="person" size={20} color="#fff" />
+            <Text style={styles.buttonText}>I’m a Parent</Text>
+          </TouchableOpacity>
 
-          <GameButton
-            title="I’m a Child"
-            icon={<Ionicons name="happy" size={20} color="#fff" />}
-            color={Colors.light.buttonChild}
-            onPress={() => {
-              router.push("/(auth)/(child)/login");
-            }}
-          />
+          <TouchableOpacity
+            style={[styles.button, styles.childButton]}
+            onPress={() => router.push("/(auth)/(child)/login")}
+          >
+            <Ionicons name="happy" size={20} color="#fff" />
+            <Text style={styles.buttonText}>I’m a Child</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </ImageBackground>
   );
-};
-
-export default WelcomeScreen;
+}
 
 const styles = StyleSheet.create({
   background: {
@@ -63,46 +55,47 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)", // dark overlay for contrast
+    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "space-between",
-    paddingHorizontal: 24,
-    paddingVertical: 50,
+    paddingHorizontal: wp(6),
+    paddingVertical: hp(6),
   },
   centered: {
-    marginTop: 100,
+    marginTop: hp(10),
     alignItems: "center",
   },
   title: {
     color: "#fff",
-    fontSize: 28,
-    fontWeight: "bold",
+    fontSize: hp(3.2),
+    fontWeight: "700",
     textAlign: "center",
   },
   subtitle: {
-    color: "#eee",
-    fontSize: 16,
-    marginTop: 10,
+    color: "#ddd",
+    fontSize: hp(1.8),
+    marginTop: hp(1),
     textAlign: "center",
   },
   buttonContainer: {
-    width: "100%",
-    gap: hp(1),
+    gap: hp(2),
+  },
+  button: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: hp(2),
+    borderRadius: 12,
   },
   parentButton: {
     backgroundColor: "#2e86de",
-    paddingVertical: 16,
-    borderRadius: 10,
-    marginBottom: 16,
   },
   childButton: {
     backgroundColor: "#45aaf2",
-    paddingVertical: 16,
-    borderRadius: 10,
   },
   buttonText: {
     color: "#fff",
+    fontSize: hp(2),
     fontWeight: "600",
-    textAlign: "center",
-    fontSize: 16,
+    marginLeft: wp(2),
   },
 });

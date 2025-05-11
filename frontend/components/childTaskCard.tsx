@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Animated, { ZoomIn } from "react-native-reanimated";
 
 interface Props {
+  id: string;
   name: string;
   avatar: string;
   total: number;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const ChildTaskCard: React.FC<Props> = ({
+  id,
   name,
   avatar,
   total,
@@ -20,28 +22,24 @@ const ChildTaskCard: React.FC<Props> = ({
 }) => {
   const progress = Math.round((done / total) * 100);
   const router = useRouter();
+
   return (
     <Animated.View
       entering={ZoomIn.duration(400).springify().damping(15)}
       style={[styles.card, { backgroundColor: color }]}
     >
       <TouchableOpacity
-        onPress={() => {
-          router.push("/(home)/(parent)/(screens)/child-detail-screen");
-        }}
+        onPress={() => router.push(`../(screens)/child-detail-screen/${id}`)}
         activeOpacity={0.85}
       >
-        {/* Emoji and options */}
         <View style={styles.row}>
           <Text style={styles.emoji}>{avatar}</Text>
           <Text style={styles.options}>⋮</Text>
         </View>
 
-        {/* Name & Task */}
         <Text style={styles.name}>{name}</Text>
         <Text style={styles.taskCount}>{total} Tasks</Text>
 
-        {/* Progress section */}
         <View style={styles.progressContainer}>
           <View style={styles.progressBarTrack}>
             <View

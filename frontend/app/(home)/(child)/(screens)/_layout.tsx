@@ -10,6 +10,8 @@ export default function Layout() {
       <Stack.Screen name="game-two" options={{ headerShown: false }} />
       <Stack.Screen name="game-three" options={{ headerShown: false }} />
       <Stack.Screen name="game-ten" options={{ headerShown: false }} />
+      <Stack.Screen name="shop" options={{ headerShown: false }} />
+      <Stack.Screen name="my-tasks" options={{ headerShown: false }} />
     </Stack>
   );
 }
