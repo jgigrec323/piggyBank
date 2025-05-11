@@ -5,47 +5,81 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  Alert,
+  TextInput,
 } from "react-native";
 import { hp, wp } from "@/utils/responsive";
 import { useRouter } from "expo-router";
+import { useApp } from "@/context/app-context";
 
 export default function Stage2AtmScreen() {
   const router = useRouter();
+  const {
+    moneyInPocket,
+    updatePocket,
+    bankUser,
+    completedStages,
+    markStageComplete,
+  } = useApp();
 
-  const [balance, setBalance] = useState(150); // starting fake balance
+  const [balance, setBalance] = useState(0);
+  const [amount, setAmount] = useState("");
   const [transactions, setTransactions] = useState([
-    { id: "1", label: "Account created", amount: 0 },
-    { id: "2", label: "Welcome bonus", amount: 50 },
-    { id: "3", label: "Chore reward", amount: 100 },
+    { id: "1", label: "Bank Account Created", amount: 0 },
   ]);
 
-  const addCoins = (amount: number, label: string) => {
-    setBalance((prev) => prev + amount);
+  const handleDeposit = () => {
+    const amt = parseInt(amount);
+    if (isNaN(amt) || amt <= 0) {
+      Alert.alert("Invalid amount", "Please enter a valid deposit amount.");
+      return;
+    }
+    if (moneyInPocket < amt) {
+      Alert.alert("Not enough coins", "You don't have enough in your pocket.");
+      return;
+    }
+    setBalance((prev) => prev + amt);
+    updatePocket(-amt);
     setTransactions((prev) => [
-      { id: Date.now().toString(), label, amount },
+      { id: Date.now().toString(), label: "Deposit from Pocket", amount: amt },
       ...prev,
     ]);
+    setAmount("");
   };
 
-  const withdraw = (amount: number, label: string) => {
-    if (balance < amount) return;
-    setBalance((prev) => prev - amount);
+  const handleWithdraw = () => {
+    const amt = parseInt(amount);
+    if (isNaN(amt) || amt <= 0) {
+      Alert.alert("Invalid amount", "Please enter a valid withdraw amount.");
+      return;
+    }
+    if (balance < amt) {
+      Alert.alert("Not enough balance", "Your bank balance is too low.");
+      return;
+    }
+    setBalance((prev) => prev - amt);
+    updatePocket(amt);
     setTransactions((prev) => [
-      { id: Date.now().toString(), label, amount: -amount },
+      {
+        id: Date.now().toString(),
+        label: "Withdraw to Pocket",
+        amount: -amt,
+      },
       ...prev,
     ]);
+    setAmount("");
   };
 
   return (
     <View style={styles.container}>
-      {/* Header Card */}
+      {/* 🏦 Header */}
       <View style={styles.card}>
-        <Text style={styles.title}>🎰 My ATM</Text>
-        <Text style={styles.name}>👦 Amira</Text>
-        <Text style={styles.balance}>Balance: {balance} 🪙</Text>
+        <Text style={styles.name}>👦 {bankUser?.name ?? "Kid"}</Text>
+        <Text style={styles.balance}>Bank Balance: {balance} 🪙</Text>
+        <Text style={styles.balance}>In Pocket: {moneyInPocket} 🪙</Text>
       </View>
 
-      {/* Transaction History */}
+      {/* 📜 Transactions */}
       <Text style={styles.sectionTitle}>Transactions</Text>
       <FlatList
         data={transactions}
@@ -67,34 +101,41 @@ export default function Stage2AtmScreen() {
         style={styles.txList}
       />
 
-      {/* Buttons */}
-      <View style={styles.actions}>
-        <TouchableOpacity
-          style={[styles.btn, { backgroundColor: "#43a047" }]}
-          onPress={() => addCoins(20, "Mini Job")}
-        >
-          <Text style={styles.btnText}>Deposit +20</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.btn, { backgroundColor: "#ef5350" }]}
-          onPress={() => withdraw(10, "Snack bought")}
-        >
-          <Text style={styles.btnText}>Withdraw -10</Text>
-        </TouchableOpacity>
+      {/* 💳 Actions */}
+      <Text style={styles.sectionTitle}>Manage Your Coins</Text>
+      <View style={styles.actionBox}>
+        <TextInput
+          value={amount}
+          onChangeText={setAmount}
+          keyboardType="numeric"
+          placeholder="Enter amount"
+          style={styles.input}
+        />
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={[styles.btn, { backgroundColor: "#4caf50" }]}
+            onPress={handleDeposit}
+          >
+            <Text style={styles.btnText}>Deposit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.btn, { backgroundColor: "#ef5350" }]}
+            onPress={handleWithdraw}
+          >
+            <Text style={styles.btnText}>Withdraw</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      {/* Continue Button */}
+      {/* 🗺 Go to Map */}
       <TouchableOpacity
-        style={styles.nextBtn}
-        onPress={() => router.push("/stage-two")}
+        style={[
+          styles.nextBtn,
+          { backgroundColor: "#607d8b", marginTop: hp(4) },
+        ]}
+        onPress={() => router.replace("/")}
       >
-        <Text style={styles.nextText}>Level 2</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.nextBtn}
-        onPress={() => router.push("/stage-two")}
-      >
-        <Text style={styles.nextText}>Level 3</Text>
+        <Text style={styles.nextText}>Go to Map</Text>
       </TouchableOpacity>
     </View>
   );
@@ -112,11 +153,6 @@ const styles = StyleSheet.create({
     padding: hp(2.5),
     marginBottom: hp(3),
   },
-  title: {
-    fontSize: hp(2.5),
-    color: "#fff",
-    fontWeight: "600",
-  },
   name: {
     fontSize: hp(2.2),
     color: "#fff",
@@ -126,11 +162,12 @@ const styles = StyleSheet.create({
     fontSize: hp(2.4),
     color: "#fff",
     fontWeight: "700",
-    marginTop: hp(1),
+    marginTop: hp(0.5),
   },
   sectionTitle: {
     fontSize: hp(2),
     fontWeight: "600",
+    marginTop: hp(3),
     marginBottom: hp(1),
     color: "#333",
   },
@@ -152,16 +189,29 @@ const styles = StyleSheet.create({
     fontSize: hp(1.8),
     fontWeight: "600",
   },
-  actions: {
+  actionBox: {
+    marginTop: hp(1),
+  },
+  input: {
+    backgroundColor: "#fff",
+    padding: hp(1.2),
+    borderRadius: 10,
+    fontSize: hp(2),
+    borderWidth: 1,
+    borderColor: "#ccc",
+  },
+  buttonRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: hp(3),
+    marginTop: hp(1.5),
+    gap: wp(4),
   },
   btn: {
-    flex: 0.48,
+    flex: 1,
     borderRadius: 12,
     paddingVertical: hp(1.6),
     alignItems: "center",
+    paddingHorizontal: wp(4),
   },
   btnText: {
     color: "#fff",

@@ -15,7 +15,7 @@ export default function Stage1CreateBank() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-  const { setHasBankAccount } = useApp();
+  const { setHasBankAccount, setBankUser } = useApp();
 
   const handleSubmit = () => {
     if (!name.trim() || !password.trim()) {
@@ -23,10 +23,12 @@ export default function Stage1CreateBank() {
       return;
     }
 
-    Alert.alert("🎉 Success", `Bank account created for ${name}`);
-    setHasBankAccount(true); // ✅ Mark bank account as created
+    // ✅ Save bank user data
+    setHasBankAccount(true);
+    setBankUser({ name, password });
 
-    router.push("/stage-two"); // Replace with your map or stage route
+    Alert.alert("🎉 Success", `Bank account created for ${name}`);
+    router.push("/stage-two");
   };
 
   return (
@@ -42,13 +44,13 @@ export default function Stage1CreateBank() {
       />
 
       <TextInput
-        placeholder="Password"
+        placeholder="4-digit Password"
         value={password}
         onChangeText={setPassword}
         keyboardType="number-pad"
         secureTextEntry
         style={styles.input}
-        maxLength={4} // optional 4-digit PIN
+        maxLength={4}
       />
 
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>

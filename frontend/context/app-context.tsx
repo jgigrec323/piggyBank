@@ -16,6 +16,8 @@ interface AppState {
   setHasBankAccount: (value: boolean) => void;
   markStageComplete: (stageKey: keyof AppState["completedStages"]) => void;
   resetGame: () => void;
+  bankUser: { name: string; password: string } | null;
+  setBankUser: (user: { name: string; password: string } | null) => void;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -33,6 +35,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     stage10PiggyPuzzle: false,
     // Add future stages here
   });
+  const [bankUser, setBankUser] = useState<{
+    name: string;
+    password: string;
+  } | null>(null);
 
   const updatePocket = (amount: number) => {
     setMoneyInPocket((prev) => Math.max(prev + amount, 0));
@@ -71,6 +77,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
         setHasBankAccount,
         markStageComplete,
         resetGame,
+        bankUser,
+        setBankUser,
       }}
     >
       {children}

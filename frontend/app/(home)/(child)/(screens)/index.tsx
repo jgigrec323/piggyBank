@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  Text,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -15,7 +16,6 @@ import { useApp } from "@/context/app-context";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-// Dummy game zones with random positions and icons
 const gameZones = [
   {
     top: 200,
@@ -52,14 +52,21 @@ const gameZones = [
 export default function LandingPage() {
   const [soundOn, setSoundOn] = useState(true);
   const router = useRouter();
-  const { hasBankAccount } = useApp();
+  const { hasBankAccount, moneyInPocket } = useApp();
 
-  const shuffledZones = useMemo(() => {
-    return [...gameZones].sort(() => Math.random() - 0.5);
-  }, []);
+  const shuffledZones = useMemo(
+    () => [...gameZones].sort(() => Math.random() - 0.5),
+    []
+  );
 
   return (
     <View style={styles.container}>
+      {/* 💰 Wallet Box */}
+      <View style={styles.coinsBox}>
+        <Ionicons name="wallet" size={18} color="#fff" />
+        <Text style={styles.coinsText}>{moneyInPocket} coins</Text>
+      </View>
+
       {/* 🗺 Map Scroll */}
       <ScrollView
         horizontal
@@ -170,5 +177,23 @@ const styles = StyleSheet.create({
     paddingVertical: hp(1.8),
     borderRadius: 16,
     elevation: 4,
+  },
+  coinsBox: {
+    position: "absolute",
+    top: hp(4),
+    left: wp(5),
+    backgroundColor: "rgba(0,0,0,0.6)",
+    paddingVertical: hp(0.7),
+    paddingHorizontal: wp(3),
+    borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: wp(1.5),
+    zIndex: 20,
+  },
+  coinsText: {
+    color: "#fff",
+    fontSize: hp(1.8),
+    fontWeight: "600",
   },
 });
